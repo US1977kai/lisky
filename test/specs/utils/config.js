@@ -305,7 +305,7 @@ describe('config util', () => {
 																() => {
 																	Then(
 																		`the user should be informed that the config file at "${
-																			process.env.LISKY_CONFIG_DIR
+																			process.env.LISK_COMMANDER_CONFIG_DIR
 																		}/config.json" is corrupted`,
 																		then.theUserShouldBeInformedThatTheConfigFileIsCorrupted,
 																	);
