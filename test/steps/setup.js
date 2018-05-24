@@ -17,7 +17,7 @@ import childProcess from 'child_process';
 import fs from 'fs';
 import readline from 'readline';
 import lockfile from 'lockfile';
-import lisk from 'lisk-js';
+import elements from 'lisk-elements';
 import cryptography from '../../src/utils/cryptography';
 import * as fsUtils from '../../src/utils/fs';
 import * as helpers from '../../src/utils/helpers';
@@ -80,7 +80,7 @@ const setUpReadlineStubs = () => {
 	sandbox.stub(readline, 'createInterface');
 };
 
-function setUpLiskJSAPIStubs() {
+function setUpLiskElementsAPIStubs() {
 	const queryDefaultResult = { success: true };
 	const broadcastTransactionResponse = {
 		message: 'Transaction accepted by the node for processing',
@@ -112,7 +112,7 @@ function setUpLiskJSAPIStubs() {
 	});
 }
 
-const setUpLiskJSCryptoStubs = () => {
+const setUpLiskElementsCryptoStubs = () => {
 	[
 		'encryptMessageWithPassphrase',
 		'decryptMessageWithPassphrase',
@@ -124,7 +124,7 @@ const setUpLiskJSCryptoStubs = () => {
 		'verifyMessageWithPublicKey',
 		'parseEncryptedPassphrase',
 		'stringifyEncryptedPassphrase',
-	].forEach(methodName => sandbox.stub(lisk.cryptography, methodName));
+	].forEach(methodName => sandbox.stub(elements.cryptography, methodName));
 };
 
 const setUpCryptoStubs = () => {
@@ -165,6 +165,10 @@ const setUpTransactionsStubs = () => {
 		'castVotes',
 		'registerMultisignature',
 	].forEach(methodName => sandbox.stub(transactions, methodName));
+	transactions.utils = {
+		verifyTransaction: sandbox.stub().returns(true),
+		prepareTransaction: sandbox.stub(),
+	};
 };
 
 const setUpInputStubs = () => {
@@ -205,12 +209,12 @@ const restoreEnvVariable = variable =>
 	};
 
 export function setUpCommandBroadcastSignature() {
-	setUpLiskJSAPIStubs.call(this);
+	setUpLiskElementsAPIStubs.call(this);
 	this.test.ctx.apiResponse = this.test.ctx.broadcastSignaturesResponse;
 }
 
 export function setUpCommandBroadcastTransaction() {
-	setUpLiskJSAPIStubs.call(this);
+	setUpLiskElementsAPIStubs.call(this);
 	this.test.ctx.apiResponse = this.test.ctx.broadcastTransactionResponse;
 }
 
@@ -294,6 +298,19 @@ export function setUpCommandVerifyMessage() {
 	setUpInputStubs();
 }
 
+export function setUpCommandVerifyTransaction() {
+	setUpTransactionsStubs();
+	setUpReadlineStubs();
+	setUpInputUtilsStubs();
+}
+
+export function setUpCommandSignTransaction() {
+	setUpTransactionsStubs();
+	setUpReadlineStubs();
+	setUpInputStubs();
+	setUpInputUtilsStubs();
+}
+
 export function setUpUtilConfig() {
 	setUpEnvVariable(EXEC_FILE_CHILD).call(this);
 	setUpEnvVariable(LISK_COMMANDER_CONFIG_DIR).call(this);
@@ -317,7 +334,7 @@ export function setUpUtilCreateCommand() {
 }
 
 export function setUpUtilCrypto() {
-	setUpLiskJSCryptoStubs();
+	setUpLiskElementsCryptoStubs();
 }
 
 export function setUpUtilFs() {
@@ -342,7 +359,7 @@ export function tearDownUtilInputUtils() {
 }
 
 export function setUpUtilQuery() {
-	setUpLiskJSAPIStubs.call(this);
+	setUpLiskElementsAPIStubs.call(this);
 }
 
 export function setUpUtilLog() {
